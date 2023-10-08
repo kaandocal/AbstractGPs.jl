@@ -9,7 +9,15 @@
         x′ = collect(range(-1.0, 1.0; length=N′))
 
         @test mean(f, x) == AbstractGPs._map(m, x)
+        y = similar(x)
+        mean!(y, f, x)
+        @test y ≈ mean(f, x)
+
         @test cov(f, x) == kernelmatrix(k, x)
+        z = similar(cov(f, x))
+        cov!(z, f, x)
+        @test z ≈ cov(f, x)
+
         abstractgp_interface_tests(f, x, x′)
     end
 

@@ -6,4 +6,7 @@
     @test_throws ErrorException cov(f)
     @test_throws ErrorException mean_and_var(f)
     @test_throws ErrorException mean_and_cov(f)
+
+    y = zeros(5)
+    z = zeros(5, 5)
 end

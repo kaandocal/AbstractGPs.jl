@@ -46,6 +46,7 @@ true
 ```
 """
 Statistics.mean(fx::FiniteGP) = mean(fx.f, fx.x)
+Statistics.mean!(out::AbstractVector, fx::FiniteGP) = mean!(out, fx.f, fx.x)
 
 """
     cov(f::FiniteGP)
@@ -91,6 +92,11 @@ true
 """
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
+function cov!(out::AbstractMatrix, f::FiniteGP) 
+    cov!(out, f.f, f.x)
+    out .+= f.Σy
+end
+
 """
     var(f::FiniteGP)
 
@@ -110,6 +116,12 @@ function Statistics.var(f::FiniteGP)
     return var(f.f, f.x) + view(Σy, diagind(Σy))
 end
 
+function var!(out::AbstractVector, f::FiniteGP)
+    var!(out, f.f, f.x)
+    out .+= view(f.Σy, diagind(f.Σy))
+end
+
+
 """
     mean_and_cov(f::FiniteGP)
 
@@ -128,6 +140,13 @@ function StatsBase.mean_and_cov(f::FiniteGP)
     m, C = mean_and_cov(f.f, f.x)
     return m, C + f.Σy
 end
+
+function mean_and_cov!(mout::AbstractVector, cout::AbstractMatrix, f::FiniteGP)
+    mean_and_cov!(mout, cout, f.f, f.x)
+    cout .+= f.Σy
+    (mout, cout)
+end
+
 
 """
     mean_and_var(f::FiniteGP)
@@ -150,6 +169,13 @@ function StatsBase.mean_and_var(f::FiniteGP)
     Σy = f.Σy
     return m, c + view(Σy, diagind(Σy))
 end
+
+function mean_and_var!(mout::AbstractVector, vout::AbstractVector, f::FiniteGP)
+    mean_and_var!(mout, vout, f.f, f.x)
+    vout .+= view(f.Σy, diagind(f.Σy))
+    (mout, vout)
+end
+
 
 """
     cov(fx::FiniteGP, gx::FiniteGP)

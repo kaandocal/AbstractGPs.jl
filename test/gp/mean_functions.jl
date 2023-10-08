@@ -10,6 +10,9 @@
 
         for x in [x]
             @test AbstractGPs._map(f, x) == zeros(size(x))
+            y = similar(x)
+            AbstractGPs._map!(f, y, x)
+            @test y == zeros(size(y))
             # differentiable_mean_function_tests(f, randn(rng, P), x)
         end
 
@@ -31,7 +34,11 @@
         m = ConstMean(c)
 
         for x in [x]
-            @test AbstractGPs._map(m, x) == fill(c, N)
+            @test AbstractGPs._map(m, x) == fill(c, N)            
+            y = similar(x)
+            AbstractGPs._map!(m, y, x)
+            @test y == fill(c, N)
+ 
             # differentiable_mean_function_tests(m, randn(rng, N), x)
         end
     end
@@ -42,6 +49,9 @@
         f = CustomMean(foo_mean)
 
         @test AbstractGPs._map(f, x) == map(foo_mean, x)
+        y = similar(x)
+        AbstractGPs._map!(f, y, x)
+        @test y == map(foo_mean, x)
         # differentiable_mean_function_tests(f, randn(rng, N), x)
     end
 end

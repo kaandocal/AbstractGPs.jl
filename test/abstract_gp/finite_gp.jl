@@ -19,9 +19,33 @@ end
         @test FiniteGP(f, Xmat, σ²; obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
         @test FiniteGP(f, Xmat, σ²; obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²)
         @test mean(fx) == mean(f, x)
+
+        y = similar(x)
+        mean!(y, fx)
+        @test y == mean(fx)
+
+        y = similar(y)
+        mean!(y, f, x)
+        @test y ≈ mean(fx)
+
         @test cov(fx) == cov(f, x)
+        z = similar(cov(fx))
+        cov!(z, fx)
+        @test z ≈ cov(fx)
+
+        z = similar(z)
+        cov!(z, f, x)
+        @test z ≈ cov(f, x)
+
         @test var(fx) == diag(cov(fx))
+        var!(y, fx)
+        @test y ≈ var(fx)
+
         @test cov(fx, fx′) == cov(f, x, x′)
+        w = similar(cov(fx, fx′))
+        cov!(w, f, x, x′)
+        @test w ≈ cov(f, x, x′)
+
         @test mean.(marginals(fx)) == mean(f(x))
         @test var.(marginals(fx)) == var(f, x)
         @test std.(marginals(fx)) == sqrt.(var(f, x))
@@ -29,11 +53,23 @@ end
             m, C = mean_and_cov(fx)
             @test m == mean(fx)
             @test C == cov(fx)
+
+            a = similar(m)
+            B = similar(C)
+            mean_and_cov!(a, B, fx)
+            @test a ≈ mean(fx)
+            @test B ≈ cov(fx)
         end
         let
             m, c = mean_and_var(fx)
             @test m == mean(fx)
             @test c == var(fx)
+
+            a = similar(m)
+            b = similar(c)
+            mean_and_var!(a, b, fx)
+            @test a ≈ mean(fx)
+            @test b ≈ var(fx)
         end
     end
     @testset "rand (deterministic)" begin

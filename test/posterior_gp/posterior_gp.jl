@@ -19,7 +19,14 @@
 
     # Verify that posterior collapses around observations.
     @test mean(f_post, x) ≈ y
+
+    a = similar(y)
+    mean!(a, f_post, x)
+    @test a ≈ mean(f_post, x)
+
     @test var(f_post, x) ≈ zeros(N_cond) rtol = 1e-14 atol = 1e-14
+    var!(a, f_post, x)
+    @test a ≈ var(f_post, x)
 
     # Check interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
